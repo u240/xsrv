@@ -1,0 +1,8 @@
+# rsyslog - monitor auditd log file
+module(load="imfile")
+
+input(type="imfile"
+      File="/var/log/audit/audit.log"
+      Tag="auditd:"
+      Facility="auth"
+      PersistStateInterval="0")
