@@ -46,6 +46,7 @@ This project provides:
 - [transmission](roles/transmission) - Transmission Bittorrent client/web interface
 - [tt_rss](roles/tt_rss) - Tiny Tiny RSS web-based news feed reader
 - [valheim_server](roles/valheim_server) - Valheim multiplayer server
+- [icecast](roles/icecast) - streaming audio/internet radio server
 <!--END ROLES LIST-->
 
 ## Screenshots

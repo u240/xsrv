@@ -46,6 +46,7 @@ This project provides:
 - [transmission](https://gitlab.com/nodiscc/xsrv/-/tree/master/roles/transmission) - Transmission Bittorrent client/web interface
 - [tt_rss](https://gitlab.com/nodiscc/xsrv/-/tree/master/roles/tt_rss) - Tiny Tiny RSS web-based news feed reader
 - [valheim_server](https://gitlab.com/nodiscc/xsrv/-/tree/master/roles/valheim_server) - Valheim multiplayer server
+- [icecast](https://gitlab.com/nodiscc/xsrv/-/tree/master/roles/icecast) - streaming audio/internet radio server
 <!--END ROLES LIST-->
 
 ## Screenshots

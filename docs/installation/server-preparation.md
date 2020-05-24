@@ -61,6 +61,7 @@ chat.CHANGEME.org # rocketchat
 media.CHANGEME.org # jellyfin
 logs.CHANGEME.org # graylog
 tty.CHANGEME.org # gotty
+radio.CHANGEME.org # icecast
 ```
 
 _Alternatively, you can add [hosts](https://en.wikipedia.org/wiki/Hosts_%28file%29) entries on your client devices for each domain name._

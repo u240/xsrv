@@ -29,8 +29,8 @@ MDomain {{ transmission_fqdn }}
     AuthUserFile /etc/apache2/transmission-passwd
     Require valid-user
   </Location>
-
   SetEnv proxy-chain-auth
+
   ProxyPreserveHost On
   ProxyRequests off
   ProxyPass / http://localhost:9091/
