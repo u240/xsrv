@@ -1,0 +1,73 @@
+---
+
+##### PACKAGES #####
+
+- name: install gitlab-runner dependencies
+  apt:
+    state: present
+    package:
+      - debian-archive-keyring
+      - apt-transport-https
+
+- name: add gitLab APT key
+  apt_key:
+    url: https://packages.gitlab.com/gpg.key
+    state: present
+
+- name: add gitLab-runner APT repository
+  apt_repository:
+    repo: 'deb https://packages.gitlab.com/runner/gitlab-runner/debian/ {{ ansible_facts.distribution_release }} main'
+    state: present
+
+- name: install gitlab-runner APT pinning preferences
+  template:
+    src: etc_apt_preferences.d_pin-gitlab-runner.pref.j2
+    dest: /etc/apt/preferences.d/pin-gitlab-runner.pref
+
+- name: Install GitLab Runner
+  apt:
+    state: present
+    package: gitlab-runner
+    update_cache: yes
+    cache_valid_time: 900
+
+##### DOWNLOADS ##### NONE
+
+##### CONFIGURATION #####
+
+# - name: Set concurrent option
+#   lineinfile:
+#     dest: /etc/gitlab-runner/config.toml TODO
+#     regexp: ^concurrent =
+#     line: concurrent = {{ gitlab_runner_concurrent }}
+#     state: present
+
+##### MYSQL ##### NONE
+
+###### FAIL2BAN ############ NONE
+
+##### BACKUPS ##### NONE
+
+##### FILES IN WEBROOT ##### NONE
+
+##### FILE PERMISSIONS ##### NONE
+
+##### COMMAND-LINE/MISC INSTALLATION STEPS #####
+
+# TODO
+# - name: List configured runners
+#   command: gitlab-runner list
+#   register: configured_runners
+#   changed_when: False
+
+# TODO
+# - name: Register runner to GitLab
+#   command: gitlab-runner register >
+#     --non-interactive
+#     --url '{{ gitlab_runner_coordinator_url }}'
+#     --registration-token '{{ gitlab_runner_registration_token }}'
+#     --description '{{ gitlab_runner_description }}'
+#     --tag-list '{{ gitlab_runner_tags | join(",") }}'
+#     --executor '{{ gitlab_runner_executor }}'
+#     --docker-image '{{ gitlab_runner_docker_image }}'
+# when: configured_runners.stderr.find('\n{{ gitlab_runner_description }}') == -1

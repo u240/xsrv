@@ -1,0 +1,6 @@
+---
+
+- include: gitlab-runner.yml
+  become: yes
+  tags:
+    - gitlab-runner

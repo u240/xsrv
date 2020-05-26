@@ -1,0 +1,18 @@
+galaxy_info:
+  author: nodiscc
+  description: gitlab-runner CI worker
+  license: GPL-3.0
+  min_ansible_version: 2.7
+  platforms:
+    - name: Debian
+      versions:
+        - buster
+  galaxy_tags:
+    - continuous
+    - integration
+    - deployement
+    - gitlab
+    - CI
+    - CD
+    - build
+    - automation
