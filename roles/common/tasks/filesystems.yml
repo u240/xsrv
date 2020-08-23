@@ -1,0 +1,5 @@
+- name: copy systemd /tmp mount configuration (noexec)
+  template:
+    src: etc_systemd_system_tmp.mount.j2
+    dest: /etc/systemd/system/tmp.mount
+    mode: 0644
