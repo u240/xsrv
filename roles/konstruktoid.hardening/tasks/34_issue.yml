@@ -1,0 +1,17 @@
+---
+- name: add notice
+  become: 'yes'
+  template:
+    src: etc/issue.j2
+    dest: "{{ item }}"
+    backup: 'yes'
+    mode: 0644
+    owner: root
+    group: root
+  with_items:
+    - /etc/issue
+    - /etc/issue.net
+    - /etc/motd
+  tags:
+    - motd
+...

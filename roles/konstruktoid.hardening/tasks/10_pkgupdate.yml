@@ -1,0 +1,130 @@
+---
+- name: apt update
+  become: 'yes'
+  apt:
+    update_cache: 'yes'
+    cache_valid_time: 1800
+  when: ansible_os_family == "Debian"
+  tags:
+    - apt
+
+- name: apt upgrade
+  become: 'yes'
+  apt:
+    upgrade: safe
+  notify:
+    - apt-get clean
+    - apt-get autoremove
+  environment:
+    PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  when: ansible_os_family == "Debian"
+  tags:
+    - apt
+
+- name: python-rpm installation
+  become: 'yes'
+  dnf:
+    name: "python2-rpm"
+    state: present
+  when: ansible_distribution == "RedHat"
+  tags:
+    - yum
+    - packages
+    - firewalld
+
+- name: link dnf.conf
+  become: 'yes'
+  file:
+    src: /etc/dnf/dnf.conf
+    dest: /etc/yum.conf
+    owner: root
+    group: root
+    state: link
+  when: ansible_distribution == "Fedora"
+  tags:
+    - dnf
+    - yum
+
+- name: import RedHat RPM key
+  become: 'yes'
+  rpm_key:
+    state: present
+    key: https://sks-keyservers.net/pks/lookup?op=get&search=0x{{ item }}
+  with_items:
+    - "{{ redhat_rpm_key }}"
+  when: ansible_distribution == "RedHat"
+  tags:
+    - dnf
+    - yum
+
+- name: set yum.conf gpgcheck
+  become: 'yes'
+  lineinfile:
+    regexp: "^gpgcheck="
+    line: "gpgcheck=1"
+    dest: /etc/yum.conf
+    mode: 0644
+    state: present
+    create: 'no'
+    backrefs: 'yes'
+  when: ansible_os_family == "RedHat"
+  tags:
+    - dnf
+    - yum
+
+- name: set yum.conf clean_requirements
+  become: 'yes'
+  lineinfile:
+    line: "clean_requirements_on_remove=True"
+    dest: /etc/yum.conf
+    mode: 0644
+    state: present
+    create: 'yes'
+    insertafter: "[main]"
+  when: ansible_os_family == "RedHat"
+  tags:
+    - dnf
+    - yum
+
+- name: set yum.conf localpkg_gpgcheck
+  become: 'yes'
+  lineinfile:
+    line: "localpkg_gpgcheck=1"
+    dest: /etc/yum.conf
+    mode: 0644
+    state: present
+    create: 'yes'
+    insertafter: "[main]"
+  when: ansible_os_family == "RedHat"
+  tags:
+    - dnf
+    - yum
+
+- name: comment yum.conf repo_gpgcheck
+  become: 'yes'
+  lineinfile:
+    line: "# repo_gpgcheck=1"
+    dest: /etc/yum.conf
+    mode: 0644
+    state: present
+    create: 'yes'
+    insertafter: "[main]"
+  when: ansible_os_family == "RedHat"
+  tags:
+    - dnf
+    - yum
+
+- name: enable centos PowerTools repo
+  become: 'yes'
+  lineinfile:
+    regexp: "^enabled="
+    line: "enabled=1"
+    dest: /etc/yum.repos.d/CentOS-PowerTools.repo
+    mode: 0644
+    state: present
+    create: 'no'
+  when: ansible_distribution == "CentOS"
+  tags:
+    - dnf
+    - yum
+...

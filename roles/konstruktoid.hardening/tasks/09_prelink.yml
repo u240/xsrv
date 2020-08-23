@@ -1,0 +1,35 @@
+---
+- name: sysconfig prelink
+  stat:
+    path: /etc/sysconfig/prelink
+  register: sysconfig_prelink_exists
+  tags:
+    - prelink
+
+- name: etc prelink config
+  stat:
+    path: /etc/prelink.conf
+  register: etc_prelink_exists
+  tags:
+    - prelink
+
+- name: disable prelinking
+  become: 'yes'
+  lineinfile:
+    line: "PRELINKING=no"
+    dest: /etc/sysconfig/prelink
+    mode: 0644
+    state: present
+    create: 'yes'
+  when: ansible_os_family == "RedHat"
+  tags:
+    - prelink
+
+- name: return to non-prelinked state
+  become: 'yes'
+  command: prelink -ua
+  when: sysconfig_prelink_exists or etc_prelink_exists
+  ignore_errors: true
+  tags:
+    - prelink
+...

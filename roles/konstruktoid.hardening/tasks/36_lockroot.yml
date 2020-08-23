@@ -1,0 +1,10 @@
+---
+- name: lock root account
+  become: 'yes'
+  user:
+    name: root
+    password_lock: 'yes'
+  tags:
+    - users
+    - lock_root
+...

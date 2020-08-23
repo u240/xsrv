@@ -1,0 +1,95 @@
+---
+- name: create custom facts directory
+  become: 'yes'
+  file:
+    path: /etc/ansible/facts.d
+    recurse: true
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+  tags:
+    - fact
+
+- name: systemd version fact
+  become: 'yes'
+  template:
+    src: etc/ansible/facts.d/systemd.fact
+    dest: /etc/ansible/facts.d/systemd.fact
+    mode: 0755
+    owner: root
+    group: root
+  tags:
+    - systemd
+    - fact
+
+- name: cpuinfo rdrand fact
+  become: 'yes'
+  template:
+    src: etc/ansible/facts.d/cpuinfo.fact
+    dest: /etc/ansible/facts.d/cpuinfo.fact
+    mode: 0755
+    owner: root
+    group: root
+  tags:
+    - cpuinfo
+    - rdrand
+    - fact
+
+- name: reboot required fact
+  become: 'yes'
+  template:
+    src: etc/ansible/facts.d/reboot.fact
+    dest: /etc/ansible/facts.d/reboot.fact
+    mode: 0755
+    owner: root
+    group: root
+  when: ansible_distribution == "Ubuntu"
+  tags:
+    - reboot
+    - fact
+
+- name: ssh keys fact
+  become: 'yes'
+  template:
+    src: etc/ansible/facts.d/sshkeys.fact
+    dest: /etc/ansible/facts.d/sshkeys.fact
+    mode: 0755
+    owner: root
+    group: root
+  tags:
+    - sshd
+    - fact
+
+- name: update facts
+  setup: ~
+  tags:
+    - fact
+
+- name: install python-pexpect
+  become: 'yes'
+  apt:
+    name: python-pexpect
+    state: present
+    update_cache: 'yes'
+  when: ansible_os_family == "Debian" and ansible_python.version.major <= 2
+
+- name: install python3-pexpect
+  become: 'yes'
+  apt:
+    name: python3-pexpect
+    state: present
+    update_cache: 'yes'
+  when: ansible_os_family == "Debian" and ansible_python.version.major >= 3
+
+- name: redhat family epel installation
+  become: 'yes'
+  dnf:
+    name: "epel-release"
+    state: present
+    update_cache: 'yes'
+  when: ansible_os_family == "RedHat" and (not ansible_distribution == "Fedora")
+  tags:
+    - dnf
+    - packages
+...

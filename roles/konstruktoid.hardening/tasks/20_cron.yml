@@ -1,0 +1,72 @@
+---
+- name: remove cron.deny and at.deny
+  become: 'yes'
+  file:
+    path: "{{ item }}"
+    state: absent
+  ignore_errors: true
+  with_items:
+    - /etc/cron.deny
+    - /etc/at.deny
+    - /etc/cron.allow
+    - /etc/at.allow
+  tags:
+    - at
+    - cron
+
+- name: allow root cron and at
+  become: 'yes'
+  lineinfile:
+    line: "root"
+    dest: "{{ item }}"
+    mode: 0600
+    state: present
+    create: 'yes'
+  with_items:
+    - /etc/cron.allow
+    - /etc/at.allow
+  tags:
+    - at
+    - cron
+
+- name: mask atd
+  become: 'yes'
+  systemd:
+    name: atd
+    masked: 'yes'
+    enabled: 'no'
+    state: stopped
+  ignore_errors: true
+  tags:
+    - at
+    - systemd
+
+- name: cron permissions
+  become: 'yes'
+  file:
+    path: "{{ item }}"
+    mode: 0700
+    owner: root
+    group: root
+  with_items:
+    - /etc/cron.d
+    - /etc/cron.daily
+    - /etc/cron.hourly
+    - /etc/cron.weekly
+    - /etc/cron.monthly
+  ignore_errors: true
+  tags:
+    - cron
+
+- name: crontab permissions
+  become: 'yes'
+  file:
+    path: /etc/crontab
+    mode: 0600
+    owner: root
+    group: root
+  ignore_errors: true
+  tags:
+    - cron
+    - crontab
+...

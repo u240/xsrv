@@ -1,0 +1,16 @@
+---
+- name: disable misc kernel modules
+  become: 'yes'
+  lineinfile:
+    dest: /etc/modprobe.d/disablemod.conf
+    line: "install {{ item }} /bin/true"
+    mode: 0644
+    owner: root
+    group: root
+    state: present
+    create: 'yes'
+  with_items:
+    - "{{ misc_modules_blocklist }}"
+  tags:
+    - modprobe
+...

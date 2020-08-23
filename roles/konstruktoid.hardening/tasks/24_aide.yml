@@ -1,0 +1,124 @@
+---
+- name: check cron.daily aide
+  become: 'yes'
+  stat:
+    path: /etc/cron.daily/aide
+  register: aidecron
+
+- name: aide service
+  become: 'yes'
+  template:
+    src: lib/systemd/system/aidecheck.service.j2
+    dest: /lib/systemd/system/aidecheck.service
+    backup: 'yes'
+    mode: 0644
+    owner: root
+    group: root
+  when: not aidecron.stat.exists
+  tags:
+    - aide
+
+- name: aide timer
+  become: 'yes'
+  template:
+    src: lib/systemd/system/aidecheck.timer.j2
+    dest: /lib/systemd/system/aidecheck.timer
+    backup: 'yes'
+    mode: 0644
+    owner: root
+    group: root
+  when: not aidecron.stat.exists
+  notify:
+    - reload systemd
+    - enable aidecheck
+  tags:
+    - aide
+
+- name: add aide Debian dir exclusions
+  become: 'yes'
+  blockinfile:
+    path: /etc/aide/aide.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    backup: 'yes'
+    insertafter: EOF
+    block: |
+      !/var/lib/docker
+      !/var/lib/lxcfs
+      !/var/lib/private/systemd
+      !/var/log/audit
+      !/var/log/journal
+  when: ansible_os_family == "Debian"
+  tags:
+    - aide
+
+- name: stat Debian aide.db
+  become: 'yes'
+  stat:
+    path: /var/lib/aide/aide.db
+  register: ubuaidedb
+  when: ansible_os_family == "Debian"
+  tags:
+    - aide
+
+- name: add aide RedHat dir exclusions
+  become: 'yes'
+  blockinfile:
+    path: /etc/aide.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    backup: 'yes'
+    insertafter: EOF
+    block: |
+      !/var/lib/docker
+      !/var/lib/lxcfs
+      !/var/lib/private/systemd
+      !/var/log/audit
+      !/var/log/journal
+  when: ansible_os_family == "RedHat"
+  tags:
+    - aide
+
+- name: stat RedHat aide.db
+  become: 'yes'
+  stat:
+    path: /var/lib/aide/aide.db.gz
+  register: rhelaidedb
+  when: ansible_os_family == "RedHat"
+  tags:
+    - aide
+
+- name: initialize RedHat aide
+  become: 'yes'
+  command: aide --init -B 'database_out=file:/var/lib/aide/aide.db.gz'
+  when: ansible_os_family == "RedHat" and not rhelaidedb.stat.exists
+  tags:
+    - aide
+
+- name: stat RedHat aide.db.new.gz
+  become: 'yes'
+  stat:
+    path: /var/lib/aide/aide.db.new.gz
+  register: rhelaidedbnew
+  when: ansible_os_family == "RedHat"
+  tags:
+    - aide
+
+- name: copy RedHat aide db
+  become: 'yes'
+  command: cp /var/lib/aide/aide.db.gz /var/lib/aide/aide.db.new.gz
+  when: ansible_os_family == "RedHat" and not rhelaidedbnew.stat.exists
+  tags:
+    - aide
+
+- name: initialize Debian aide
+  become: 'yes'
+  expect:
+    command: aideinit
+    timeout: null
+    responses:
+      Question:
+        - 'Overwrite /var/lib/aide/aide.db [yN]?': 'y'
+  when: ansible_os_family == "Debian" and not ubuaidedb.stat.exists
+  tags:
+    - skip_ansible_lint
+    - aide
+...

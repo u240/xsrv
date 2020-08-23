@@ -1,0 +1,59 @@
+---
+- name: systemd journald.conf
+  become: 'yes'
+  template:
+    src: etc/systemd/journald.conf.j2
+    dest: /etc/systemd/journald.conf
+    backup: 'yes'
+    mode: 0644
+    owner: root
+    group: root
+  notify:
+    - reload systemd
+  tags:
+    - systemd
+    - journald
+
+- name: logrotate.conf
+  become: 'yes'
+  template:
+    src: etc/logrotate.conf.j2
+    dest: /etc/logrotate.conf
+    backup: 'yes'
+    mode: 0644
+    owner: root
+    group: root
+  tags:
+    - logrotate
+
+- name: cron.daily logrotate
+  become: 'yes'
+  lineinfile:
+    line: "/usr/sbin/logrotate /etc/logrotate.conf"
+    dest: /etc/cron.daily/logrotate
+    mode: 0750
+    state: present
+    create: 'yes'
+  tags:
+    - logrotate
+
+- name: stat rsyslog.conf
+  become: 'yes'
+  stat:
+    path: /etc/rsyslog.conf
+  register: rsyslogconf
+  tags:
+    - rsyslog
+
+- name: set rsyslog.conf FileCreateMode
+  become: 'yes'
+  lineinfile:
+    regexp: '^\$FileCreateMode'
+    line: '$FileCreateMode 0600'
+    dest: /etc/rsyslog.conf
+    state: present
+    create: 'no'
+  when: rsyslogconf.stat.exists
+  tags:
+    - rsyslog
+...
