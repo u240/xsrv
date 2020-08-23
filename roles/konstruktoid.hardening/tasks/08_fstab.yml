@@ -1,16 +1,4 @@
 ---
-- name: create /tmp
-  become: 'yes'
-  template:
-    src: etc/systemd/tmp.mount.j2
-    dest: /lib/systemd/system/tmp.mount
-    backup: 'yes'
-    mode: 0644
-    owner: root
-    group: root
-  tags:
-    - systemd
-    - tmp
 
 - name: remove /tmp from fstab
   become: 'yes'
