@@ -133,3 +133,8 @@
     state: "{{ 'started' if apache_enable_service else 'stopped' }}"
     daemon_reload: yes
   ignore_errors: "{{ ansible_check_mode }}"
+
+##### ANSIBLE USER #####
+
+- name: add/remove the ansible user to/from the www-data group
+  
