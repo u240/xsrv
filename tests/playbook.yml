@@ -5,6 +5,7 @@
     - nodiscc.xsrv.common
     - nodiscc.xsrv.backup
     - nodiscc.xsrv.monitoring
+    - nodiscc.xsrv.libvirt
     - nodiscc.xsrv.apache
     - nodiscc.xsrv.homepage
     - nodiscc.xsrv.postgresql
