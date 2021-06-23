@@ -43,6 +43,7 @@ This project provides:
 - [transmission](roles/transmission) - Transmission Bittorrent client/web interface
 - [tt_rss](roles/tt_rss) - Tiny Tiny RSS web-based news feed reader
 - [valheim_server](roles/valheim_server) - Valheim multiplayer server
+- [autoreadme](roles/autoreadme) - automatic README.md for your playbook (inventory/information/links/monitoring badges...)
 <!--END ROLES LIST-->
 
 ## Screenshots

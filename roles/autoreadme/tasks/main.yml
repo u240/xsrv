@@ -1,0 +1,61 @@
+#### DEFAULTS/MAIN.YML
+
+autoreadme_hosts_list: hosts['all']
+
+# netdata badges to add to the README for each host. parameters:
+#   - chart: # netdata chart for this badge
+#     alarm: # alarm for the specified chart
+#     label: # (optional) the badge label
+autoreadme_netdata_badges:
+  - chart: system.cpu
+    alarm: 10min_cpu_iowait
+  - chart: system.cpu
+    alarm: 10min_cpu_usage
+  - chart: system.ram
+    alarm: ram_in_use
+  - chart: disk_space._
+    alarm: disk_space_usage
+    label: / disk space usage
+  - chart: disk_space._
+    alarm: out_of_disk_space_time
+    label: / out of disk space time
+  - chart: disk_space._var
+    alarm: disk_space_usage
+    label: /var disk space usage
+  - chart: disk_space._var
+    alarm: out_of_disk_space_time
+  - chart: needrestart.status
+    alarm: needrestart_services
+  - chart: needrestart.status
+    alarm: needrestart_kernel
+  - chart: system.swapio
+    alarm: 30min_ram_swapped_out
+    label: /var out of disk space time
+  - chart: logcount.messages
+    alarm: logcount_error
+    label: /var out of disk space time
+
+autoreadme_urls:
+  - label: monitoring
+    condition: 'hostvars[host].netdata_update_every is defined'
+    
+
+
+#### TASKS/MAIN.yml
+
+- name: insert summary in README.md
+  blockinfile:
+    path: "{{ playbook_dir }}/README.md"
+    marker: "<!-- {mark} AUTO GENERATED SUMMARY -->"
+    insertafter: '## Inventory'
+    block: |
+      {% for host in autoreadme_hosts_list %}
+      #### {{ hostvars[host].inventory_hostname }}
+      Groups: {{ hostvars[host].group_names[0] }}
+      - SSH: `ssh -p {{ hostvars[host].ansible_ssh_port|default('22') }} {{ hostvars[host].ansible_user }}@{{ hostvars[host].inventory_hostname }}`
+      - SFTP: `sftp://{{ hostvars[host].ansible_user }}@{{ hostvars[host].inventory_hostname }}:{{ hostvars[host].ansible_ssh_port|default('22') }}`
+      - Monitoring: 'https://{{ hostvars[host].inventory_hostname }}:19999'
+      {% if nextcloud_fqdn is defined %}[Nextcloud](https://{{ nextcloud_fqdn }})){% endif %}
+      {% for badge in autoreadme_netdata_badges %}
+      ![](https://{{ hostvars[item].inventory_hostname }}:19999/api/v1/badge.svg?chart={{ badge.chart }}&alarm={{ badge.alarm }}{{ '&label=' + badge.label if badge.label is defined else '' }})
+      {% endfor %}

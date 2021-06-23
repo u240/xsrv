@@ -340,6 +340,18 @@ function self_upgrade() {
     fi
 }
 
+function show_ssh_config() {
+    # display SSH client configuration for use in ~/.ssh/config
+    check_playbook
+	for i in "$playbooks_dir/$playbook_name/host_vars/"*; do \
+	host=$(basename $i); \
+	ssh_host=$(grep ansible_host "$i/$host.yml" | awk '{print $NF}'); \
+	ssh_user=$(grep ansible_user "$i/$host.yml" | awk '{print $NF}'); \
+	ssh_port=$(grep ansible_ssh_port "$i/$host.yml" | awk '{print $NF}'); \
+	echo -e "Host $host\n\tHostName $ssh_host\n\tUser $ssh_user\n\tPort $ssh_port\n"; \
+	done
+}
+
 ############################
 
 function _main() {
@@ -363,6 +375,7 @@ function _main() {
         "help") echo "$usage" ;;
         "fetch-backups") init_venv; shift; fetch_backups ;;
         "upgrade") init_venv; shift; upgrade_roles ;;
+        "show-ssh-config") show_ssh_config;;
         "show-defaults") shift; show_defaults "$@";;
         "self-upgrade") self_upgrade;;
         "init-playbook") init_venv; shift; legacy_init_playbook;;

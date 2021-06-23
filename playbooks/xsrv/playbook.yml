@@ -18,3 +18,7 @@
     # - nodiscc.xsrv.jellyfin
     # - nodiscc.xsrv.samba
     # - nodiscc.xsrv.homepage
+
+- hosts: localhost
+  roles:
+    - nodiscc.xsrv.autoreadme
