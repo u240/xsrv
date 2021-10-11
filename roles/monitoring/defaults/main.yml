@@ -17,10 +17,14 @@ rsyslog_forward_to_port: 5140
 # default interval between netdata updates (in seconds)
 # each plugin/module can override this setting (but only to set a longer interval)
 netdata_update_every: 2
+# storage backend for netdata metrics (dbengine/ram/save/map/none) https://learn.netdata.cloud/docs/agent/streaming#configuration
+netdata_memory_mode: "dbengine"
 # (MiB) amount of memory dedicated to caching metric values
 netdata_dbengine_page_cache_size: 32
 # (MiB) amount of disk space dedicated to storing Netdata metric values/metadata
 netdata_dbengine_disk_space: 800
+# enable netdata web dashboard/API (yes/no)
+netdata_web_enabled: yes
 # space-separated list of IP addresses authorized to access netdata
 netdata_allow_connections_from: '10.* 192.168.* 172.16.* 172.17.* 172.18.* 172.19.* 172.20.* 172.21.* 172.22.* 172.23.* 172.24.* 172.25.* 172.26.* 172.27.* 172.28.* 172.29.* 172.30.* 172.31.*'
 # enable netdata cloud/SaaS features (yes/no)
@@ -36,6 +40,28 @@ netdata_disable_access_log: yes
 netdata_firewalld_zones:
   - zone: internal
     state: enabled
+
+## NETDATA STREAMING ##
+# enable/disable metrics streaming to a parent node (yes/no)
+netdata_streaming_enabled: no
+# parent node to stream metrics to (hostname/IP)
+netdata_streaming_destination: "127.0.0.1"
+# TCP port to stream metrics to
+netdata_streaming_port: "127.0.0.1"
+# accept streaming requests from child nodes (list)
+#   - guid: unique ID of the child node (auto-generated in secrets/HOSTNAME.netdata_unique_id)
+#     history: number of samples to keep for each chart of the child node (default 3600)
+#     memory_mode: storage backend for metrics received from the child node (dbengine/ram/save/map/none, default ram)
+#     health_enabled: enable health alarms for this child node (yes/no)
+#     allow_from: IP addresses to allow streaming from for this child node (netdata simple pattern, default all RFC1918 addresses)
+# Example: ['secrets/my.CHANGEME.org.netdata_unique_id', 'secrets/other.CHANGEME.org.netdata_unique_id',]
+netdata_accept_streaming_from: []
+# accept streaming requests from child nodes every x (seconds)
+netdata_accept_streaming_every: 1
+
+# TODO SSL
+# TODO IMPLEMENT STREAM.CONF
+# TODO IMPLEMENT IN NETDATA.CONF
 
 ## NETDATA CHECKS ##
 # Process checks
@@ -126,7 +152,6 @@ setup_netdata_debsecan: yes
 ### CLI MONITORING UTILITIES ###
 # install ncdu, nethogs, htop, lnav (yes/no)
 setup_monitoring_cli_utils: yes
-
 
 ##### LYNIS SECURITY AUDIT #####
 # setup lynis security audit tool (yes/no)

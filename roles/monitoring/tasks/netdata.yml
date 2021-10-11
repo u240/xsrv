@@ -206,3 +206,10 @@
 # Apply IP access restrictions as soon as possible
 - name: run all notified handlers now
   meta: flush_handlers
+
+- name: download unique netdata MACHINE_GUID to the controller
+  fetch:
+    src: /var/lib/netdata/registry/netdata.unique.id
+    dest: "secrets/{{ inventory_hostname }}.netdata_unique_id"
+  when: netdata_streaming_enabled|bool
+  ignore_errors: "{{ ansible_check_mode }}"
