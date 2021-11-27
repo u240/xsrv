@@ -1,0 +1,31 @@
+- name: install NFS server
+  apt:
+    package:
+      - nfs-kernel-server
+      - nfs-common
+    state: present
+
+- name: create standard NFS share
+  file:
+    state: directory
+    path: /home/client1
+    owner: nobody
+    group: nogroup
+    mode: 0755
+
+- name: create no root squash NFS share
+  file:
+    state: directory
+    path: /home/client2
+    owner: root
+    group: root
+    mode: 0755
+
+- name: create NFS exports
+  template:
+    src: etc_exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart nfs-kernel-server

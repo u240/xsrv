@@ -221,3 +221,18 @@ mail_root_alias: "{{ ansible_user }}"
 setup_cli_utils: yes
 # install haveged entropy generator (yes/no) - good to have on virtual machines where system is frequently running out of entropy
 setup_haveged: yes
+
+### FILESYSTEM MOUNTS ###
+mount:
+  - src: "192.168.1.100:/home/client1"
+    dest: "/mnt/nfs/home/client1"
+    type: nfs
+    options: rw,sync,hard,intr,nosuid,nodev,noexec
+    state: present
+  - src: "192.168.1.100:/home/client2"
+    dest: "/mnt/nfs/home/client2"
+    type: nfs
+    options: rw,sync,hard,intr,nosuid,nodev,noexec
+    state: absent
+    # TODO create mountpoints (warn if not empty)
+    # TODO create fstab and apply mountpoints
