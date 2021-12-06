@@ -48,6 +48,14 @@ test_yamllint: venv
 	set -o pipefail && \
 	find roles/ -iname "*.yml" | xargs yamllint -c tests/.yamllint
 
+.PHONY: test_molecule # test collection with molecule
+test_molecule: venv
+	python3 -m venv .venv && \
+	source .venv/bin/activate && \
+	pip3 install molecule docker molecule[docker] && \
+	molecule --version && \
+	molecule test
+
 .PHONY: test_jinja2 # Jinja2 template syntax linter
 test_jinja2: venv
 	source .venv/bin/activate && \

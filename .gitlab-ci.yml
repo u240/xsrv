@@ -26,9 +26,12 @@ build-ci-test-image:
 test:
   stage: test
   image: $CI_REGISTRY/$CI_PROJECT_PATH/gitlab-ci-test:master
+  services:
+    - docker:dind
   variables:
     LC_ALL: "C.UTF-8"
     LANG: "C.UTF-8"
   script:
     - make tests
+    - make test_molecule
   interruptible: true
