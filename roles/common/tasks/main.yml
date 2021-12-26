@@ -66,6 +66,12 @@
     - fail2ban
   when: setup_fail2ban|bool
 
+- include: auditd.yml
+  become: yes
+  tags:
+    - common
+    - auditd
+
 - include: users.yml
   become: yes
   tags:
