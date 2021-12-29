@@ -31,4 +31,5 @@ test:
     LANG: "C.UTF-8"
   script:
     - make tests
+    - make test_ansible_check_localhost
   interruptible: true

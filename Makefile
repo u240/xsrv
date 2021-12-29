@@ -37,6 +37,11 @@ test_ansible_syntax_check: venv install_collection
 	source .venv/bin/activate && \
 	ANSIBLE_COLLECTIONS_PATHS="./" ansible-playbook --syntax-check --inventory tests/inventory.yml test.yml
 
+.PHONY: test_ansible_check_localhost # ansible playbook dry run on localhost
+test_ansible_check_localhost: venv install_collection
+	source .venv/bin/activate && \
+	ANSIBLE_COLLECTIONS_PATHS="./" ansible-playbook --extra-vars "ansible_user=$$USER" --ask-become-pass --check --diff --verbose --inventory tests/inventory.yml test.yml
+
 .PHONY: ansible_lint # ansible syntax linter
 test_ansible_lint: venv install_collection
 	source .venv/bin/activate && \
