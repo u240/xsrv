@@ -77,20 +77,21 @@ virt-install --name mynew.example.org --os-type linux --ram 1024M --vcpu 2 --dis
 It is common practice to setup a virtual machine with the bare minimum components required to enable SSH access ("golden" image), then use [configuration management](configuration-management.md) to manage all other software components. Once a [VM template](server-preparation.md) has been set up, clone it to a new VM and update its IP address, and administrator/root passwords. You may do this manually from `virt-manager` and the VM console, or using basic scripting:
 
 ```bash
+# requires sshpass libvirt pwgen
 # template configuration details
-TEMPLATE_NAME=debian10-base
-TEMPLATE_IP=10.0.0.200
-TEMPLATE_ADMIN_USER=USERNAME
-TEMPLATE_ADMIN_PASSWORD=PASSWORD
+TEMPLATE_NAME=debian10-base TEMPLATE_IP=10.10.200.221 TEMPLATE_ADMIN_USER=deploy TEMPLATE_ADMIN_PASSWORD=deploy
 # new VM configuration details
-VM_NAME=newvm.CHANGEME.org
-VM_IP=10.0.0.205
-VM_ADMIN_PASSWORD=NEWPASSWORD
-VM_ROOT_PASSWORD=NEWROOTPASSWORD
+new_password=$(pwgen -s 21 1)
+echo "[INFO] password for the administrator account in the new VM: $new_password"
+VM_NAME=newvm.CHANGEME.org VM_IP=10.10.200.105 VM_ADMIN_PASSWORD=$new_password VM_ROOT_PASSWORD=$new_password
 # clone the template to a new VM
-virt-clone --original "$TEMPLATE_NAME" --name "$VM_NAME" --file "/path/to/$VM_NAME.qcow2"
+virt-clone --original "$TEMPLATE_NAME" --name "$VM_NAME" --file "/var/lib/libvirt/images/$VM_NAME.qcow2"
 # start the new VM
 virsh start "$VM_NAME"
+# wait for the ssh server to start accepting connections
+until nc -w 1 $TEMPLATE_IP 22; do sleep 1; done
+# add the server's SSH key to known_hosts
+ssh-keyscan -H $TEMPLATE_IP >> ~/.ssh/known_hosts
 # authorize your SSH key on the new VM
 echo "$TEMPLATE_ADMIN_PASSWORD" | sshpass ssh-copy-id -i ~/.ssh/id_rsa "$TEMPLATE_ADMIN_USER"@"$TEMPLATE_IP"
 # update the IP address on the new VM

@@ -42,6 +42,45 @@ test_ansible_lint: venv install_collection
 	source .venv/bin/activate && \
 	ANSIBLE_COLLECTIONS_PATHS="./" ansible-lint -v test.yml
 
+# TOD installer still asks for hostname/domain name
+# TODO installer still asks for the disk to partition
+# TODO installer still asks "Scan extra installation media?"
+# TOD installer still asks for popcon
+# TODO installer still asks for "Device for boot loader installation" (GRUB2) (/dev/vda)
+# TODO set VM to boot to disk after installation, remove CDROM boot
+# TODO fragile virsh send-key method, replace with custom initrd build https://wiki.debian.org/DebianInstaller/Preseed#Preseeding_methods
+.PHONY: virt_install_template # setup a Debian 11 testing environment in a VM (requires libvirt + libvirt group for the current user)
+virt_install_template:
+ifndef ISO_WITH_PRESEED
+	$(error ISO_WITH_PRESEED is undefined. Please export ISO_WITH_PRESEED=./firmware-11.2.0-amd64-netinst-with-preseed.iso)
+endif
+	virt-install --name debian10-base --boot cdrom --video virtio --disk path=/var/lib/libvirt/images/debian10-base.qcow2,format=qcow2,size=20,device=disk,bus=virtio,cache=none --cdrom $$ISO_WITH_PRESEED --memory 1024 --vcpu 2 --network default --noreboot
+	# virsh destroy debian10-base && virsh undefine debian10-base && virsh vol-delete --pool default /var/lib/libvirt/images/debian10-base.qcow2
+
+.PHONY: debian_preseed # rematser a debian .iso installer and include the preseed file in the initrd
+debian_preseed:
+ifndef DEBIAN_ISO_SOURCE
+	$(error DEBIAN_ISO_SOURCE is undefined. Please export DEBIAN_ISO_SOURCE=/path/to/firmware-11.2.0-amd64-netinst.iso)
+endif
+ifndef ISO_WITH_PRESEED
+	$(error ISO_WITH_PRESEED is undefined. Please export ISO_WITH_PRESEED=/var/lib/libvirt/images/firmware-11.2.0-amd64-netinst-with-preseed.iso)
+endif
+	xorriso -osirrox on -indev $$DEBIAN_ISO_SOURCE -extract / isofiles
+	chmod +w -R isofiles/install.amd/
+	gunzip isofiles/install.amd/initrd.gz
+	cp tests/preseed.cfg preseed.cfg
+	echo preseed.cfg | cpio -H newc -o -A -F isofiles/install.amd/initrd
+	gzip isofiles/install.amd/initrd
+	chmod -w -R isofiles/install.amd/
+	chmod +w isofiles/isolinux/isolinux.bin
+	cd isofiles && \
+	chmod +w md5sum.txt && \
+	find -follow -type f ! -name md5sum.txt -print0 | xargs -0 md5sum > md5sum.txt && \
+	chmod -w md5sum.txt
+	genisoimage -r -J -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o debian-with-preseed.iso isofiles
+	sudo mv -v debian-with-preseed.iso $$ISO_WITH_PRESEED
+	chmod -R +rwX isofiles/ && rm -rf isofiles preseed.cfg
+
 .PHONY: test_yamllint # YAML syntax check and linter
 test_yamllint: venv
 	source .venv/bin/activate && \
