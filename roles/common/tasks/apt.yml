@@ -24,6 +24,12 @@
     - /etc/apt/apt.conf.d/99-norecommends
     - /etc/apt/apt.conf.d/99-no-overwrite-conffiles
 
+- name: install requirements for ansible check mode
+  apt:
+    package: python3-apt
+    state: present
+  check_mode: no # run even check mode so that 'update apt cache' handler doesn't fail
+
 # update apt cache
 - name: apply configuration (flush handlers)
   meta: flush_handlers
