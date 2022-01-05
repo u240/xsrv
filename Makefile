@@ -49,13 +49,36 @@ test_ansible_lint: venv install_collection
 # TODO installer still asks for "Device for boot loader installation" (GRUB2) (/dev/vda)
 # TODO set VM to boot to disk after installation, remove CDROM boot
 # TODO fragile virsh send-key method, replace with custom initrd build https://wiki.debian.org/DebianInstaller/Preseed#Preseeding_methods
+# TODO console too large
+TEMPLATE_DISKIMAGE_DIR := /var/lib/libvirt/images
+TEMPLATE_DISKIMAGE_SIZE := 20
+TEMPLATE_LIBVIRT_EXTRA_ARGS := console=ttyS0,115200n8 serial
+TEMPLATE_LIBVIRT_LOCATION := http://deb.debian.org/debian/dists/bullseye/main/installer-amd64
+TEMPLATE_LIBVIRT_OS_TYPE := linux
+TEMPLATE_LIBVIRT_OS_VARIANT := debian10
+TEMPLATE_PRESEED_FILE := tests/preseed.cfg
+TEMPLATE_RAM := 1024
+TEMPLATE_VCPUS := 2
+TEMPLATE_VMNAME := debian11-base
+
 .PHONY: virt_install_template # setup a Debian 11 testing environment in a VM (requires libvirt + libvirt group for the current user)
 virt_install_template:
-ifndef ISO_WITH_PRESEED
-	$(error ISO_WITH_PRESEED is undefined. Please export ISO_WITH_PRESEED=./firmware-11.2.0-amd64-netinst-with-preseed.iso)
-endif
-	virt-install --name debian10-base --boot cdrom --video virtio --disk path=/var/lib/libvirt/images/debian10-base.qcow2,format=qcow2,size=20,device=disk,bus=virtio,cache=none --cdrom $$ISO_WITH_PRESEED --memory 1024 --vcpu 2 --network default --noreboot
-	# virsh destroy debian10-base && virsh undefine debian10-base && virsh vol-delete --pool default /var/lib/libvirt/images/debian10-base.qcow2
+	virt-install \
+		--name $(TEMPLATE_VMNAME) \
+		--memory $(TEMPLATE_RAM) \
+		--disk $(TEMPLATE_DISKIMAGE_DIR)/$(TEMPLATE_VMNAME).qcow2,size=$(TEMPLATE_DISKIMAGE_SIZE),device=disk,bus=virtio,cache=none \
+		--vcpus $(TEMPLATE_VCPUS) \
+		--os-type $(TEMPLATE_LIBVIRT_OS_TYPE) \
+		--os-variant $(TEMPLATE_LIBVIRT_OS_VARIANT) \
+		--graphics none \
+		--console pty,target_type=serial \
+		--location $(TEMPLATE_LIBVIRT_LOCATION) \
+		--extra-args "$(TEMPLATE_LIBVIRT_EXTRA_ARGS)" \
+		--initrd-inject=$(TEMPLATE_PRESEED_FILE) \
+		--network default \
+		--noreboot
+	# To destroy the test VM: virsh destroy debian11-base; virsh undefine debian11-base; virsh vol-delete --pool images /var/lib/libvirt/images/debian11-base.qcow2
+	# -- video virtio?
 
 .PHONY: debian_preseed # rematser a debian .iso installer and include the preseed file in the initrd
 debian_preseed:
