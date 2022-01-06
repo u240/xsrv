@@ -61,7 +61,10 @@ TEMPLATE_RAM := 1024
 TEMPLATE_VCPUS := 2
 TEMPLATE_VMNAME := debian11-base
 
-.PHONY: virt_install_template # setup a Debian 11 testing environment in a VM (requires libvirt + libvirt group for the current user)
+# requires libvirt + current user in the libvirt group
+# the resulting VM has no video output, access over serial console only
+# to delete the VM: virsh destroy debian11-base; virsh undefine debian11-base; virsh vol-delete --pool images /var/lib/libvirt/images/debian11-base.qcow2
+.PHONY: virt_install_template # setup a Debian 11 VM template
 virt_install_template:
 	virt-install \
 		--name $(TEMPLATE_VMNAME) \
@@ -77,8 +80,12 @@ virt_install_template:
 		--initrd-inject=$(TEMPLATE_PRESEED_FILE) \
 		--network default \
 		--noreboot
-	# To destroy the test VM: virsh destroy debian11-base; virsh undefine debian11-base; virsh vol-delete --pool images /var/lib/libvirt/images/debian11-base.qcow2
-	# -- video virtio?
+	sudo virt-sysprep --domain $(TEMPLATE_VMNAME)
+
+# requires libvirt + current user in the libvirt group
+.PHONY: virt_setup_vm # setup a test VM from the template
+virt_setup_vm:
+	virt-clone --original $(TEMPLATE_VMNAME) --name my.CHANGEME.org --file $(TEMPLATE_DISKIMAGE_DIR)/my.CHANGEME.org.qcow2
 
 .PHONY: debian_preseed # rematser a debian .iso installer and include the preseed file in the initrd
 debian_preseed:
