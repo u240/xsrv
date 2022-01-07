@@ -83,6 +83,7 @@ virt_install_template:
 .PHONY: virt_setup_vm # setup a test VM from the template
 virt_setup_vm:
 	virt-clone --original $(TEMPLATE_VMNAME) --name my.CHANGEME.org --file $(TEMPLATE_DISKIMAGE_DIR)/my.CHANGEME.org.qcow2
+	virsh start my.CHANGEME.org
 
 .PHONY: debian_preseed # rematser a debian .iso installer and include the preseed file in the initrd
 debian_preseed:
