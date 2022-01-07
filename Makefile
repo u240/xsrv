@@ -80,6 +80,7 @@ virt_install_template:
 	sudo virt-sysprep --domain $(TEMPLATE_VMNAME)
 
 # requires libvirt + current user in the libvirt group
+# TODO Jan  7 17:59:29 debian11-base sshd[484]: sshd: no hostkeys available -- exiting. -> ssh-keygen -A
 .PHONY: virt_setup_vm # setup a test VM from the template
 virt_setup_vm:
 	virt-clone --original $(TEMPLATE_VMNAME) --name my.CHANGEME.org --file $(TEMPLATE_DISKIMAGE_DIR)/my.CHANGEME.org.qcow2
