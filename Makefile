@@ -42,24 +42,20 @@ test_ansible_lint: venv install_collection
 	source .venv/bin/activate && \
 	ANSIBLE_COLLECTIONS_PATHS="./" ansible-lint -v test.yml
 
-# TOD installer still asks for hostname/domain name
-# TODO installer still asks for the disk to partition
-# TODO installer still asks "Scan extra installation media?"
+# TODO installer still asks to confirm disk overwrite with LVM + size to partition
 # TOD installer still asks for popcon
 # TODO installer still asks for "Device for boot loader installation" (GRUB2) (/dev/vda)
 # TODO set VM to boot to disk after installation, remove CDROM boot
-# TODO fragile virsh send-key method, replace with custom initrd build https://wiki.debian.org/DebianInstaller/Preseed#Preseeding_methods
-# TODO console too large
-TEMPLATE_DISKIMAGE_DIR := /var/lib/libvirt/images
-TEMPLATE_DISKIMAGE_SIZE := 20
-TEMPLATE_LIBVIRT_EXTRA_ARGS := console=ttyS0,115200n8 serial
-TEMPLATE_LIBVIRT_LOCATION := http://deb.debian.org/debian/dists/bullseye/main/installer-amd64
-TEMPLATE_LIBVIRT_OS_TYPE := linux
-TEMPLATE_LIBVIRT_OS_VARIANT := debian10
-TEMPLATE_PRESEED_FILE := tests/preseed.cfg
-TEMPLATE_RAM := 1024
-TEMPLATE_VCPUS := 2
-TEMPLATE_VMNAME := debian11-base
+TEMPLATE_DISKIMAGE_DIR = /var/lib/libvirt/images
+TEMPLATE_DISKIMAGE_SIZE = 20
+TEMPLATE_LIBVIRT_EXTRA_ARGS = console=ttyS0,115200n8 serial
+TEMPLATE_LIBVIRT_LOCATION = http://deb.debian.org/debian/dists/bullseye/main/installer-amd64
+TEMPLATE_LIBVIRT_OS_TYPE = linux
+TEMPLATE_LIBVIRT_OS_VARIANT = debian10
+TEMPLATE_PRESEED_FILE = tests/preseed.cfg
+TEMPLATE_RAM = 1024
+TEMPLATE_VCPUS = 2
+TEMPLATE_VMNAME = debian11-base
 
 # requires libvirt + current user in the libvirt group
 # the resulting VM has no video output, access over serial console only
@@ -80,6 +76,7 @@ virt_install_template:
 		--initrd-inject=$(TEMPLATE_PRESEED_FILE) \
 		--network default \
 		--noreboot
+	reset
 	sudo virt-sysprep --domain $(TEMPLATE_VMNAME)
 
 # requires libvirt + current user in the libvirt group
