@@ -123,6 +123,9 @@ netdata_logcount_warning_threshold_warn: 10
 netdata_logcount_notification_to: "silent"
 # setup netdata-debsecan module (yes/no)
 setup_netdata_debsecan: yes
+# TODO
+debsecan_whitelist:
+- CVE-2021-20316 # not applicable, SMBv1 disabled
 
 ### CLI MONITORING UTILITIES ###
 # install ncdu, nethogs, htop, lnav (yes/no)
