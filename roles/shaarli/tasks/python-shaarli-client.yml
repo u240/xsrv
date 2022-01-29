@@ -1,0 +1,5 @@
+- name: install python-shaarli-client
+  pip:
+    name: git+https://github.com/shaarli/python-shaarli-client
+    virtualenv: /usr/libexec/python-shaarli-client
+    virtualenv_python: python3
