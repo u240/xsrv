@@ -42,11 +42,11 @@ LogLevel {{ ssh_log_level }}
 Ciphers aes256-ctr,aes192-ctr,aes128-ctr
 
 # **Hash algorithms**
-MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
+MACs {{ ssh_hmacs | join(',') }}
 
 
 # **Key Exchange Algorithms**
-KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
+KexAlgorithms {{ ssh_kexalgorithms | join(',') }}
 
 # Authentication
 # --------------

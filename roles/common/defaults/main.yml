@@ -82,6 +82,18 @@ ssh_allow_tcp_forwarding: "no"
 ssh_permit_root_login: "no"
 # enable/disable SSH password authentication (yes, no - QUOTED)
 ssh_password_authentication: "no"
+# SSH Server allowed Key Exchange alogrithms
+# Add other KexAlgorithms here if your clients do not support modern/secure KEX
+ssh_kexalgorithms:
+  - diffie-hellman-group-exchange-sha256
+# SSH Server allowed HMACs (hash alogrithms)
+# Add other HMAC alogrithms here if your clients do not support modern/secure HMACs
+ssh_hmacs:
+  - hmac-sha2-512-etm@openssh.com
+  - hmac-sha2-256-etm@openssh.com
+  - umac-128-etm@openssh.com
+  - hmac-sha2-512
+  - hmac-sha2-256
 
 ### FIREWALL ###
 # setup firewall (yes/no)
