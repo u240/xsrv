@@ -11,6 +11,7 @@ This role will configure a basic Debian-based server:
   - automatic security updates ([`unattended-upgrades`](https://wiki.debian.org/UnattendedUpgrades))
   - preserve manually changed [`conffiles`](https://www.debian.org/doc/manuals/maint-guide/dother.en.html#conffiles) during upgrades
   - don't install [`recommended`](https://www.debian.org/doc/debian-policy/ch-relationships.html#binary-dependencies-depends-recommends-suggests-enhances-pre-depends) packages
+  - [`apt-listbugs`](https://packages.debian.org/bullseye/apt-listbugs)
 - NTP date/time synchronization
 - user accounts, resources, PAM restrictions
 - SSH server

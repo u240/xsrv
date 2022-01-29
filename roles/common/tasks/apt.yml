@@ -36,3 +36,33 @@
       - aptitude
       - unattended-upgrades
       - apt-listchanges
+
+##### APT-LISTBUGS #####
+
+- name: install apt-listbugs
+  apt:
+    state: present
+    package: apt-listbugs
+  when: apt_listbugs|bool
+  tags: apt-listbugs
+
+- name: configure apt-listbugs ignore list
+  template:
+    src: etc_apt_listbugs_ignore_bugs.j2
+    dest: /etc/apt/listbugs/ignore_bugs
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - ansible_distribution == 'Debian'
+    - apt_listbugs|bool
+  tags: apt-listbugs
+
+- name: remove automatic APT pinnings added by apt-listbugs
+  file:
+    path: /etc/apt/preferences.d/apt-listbugs
+    state: absent
+  when:
+    - ansible_distribution == 'Debian'
+    - apt_listbugs|bool
+  tags: apt-listbugs
