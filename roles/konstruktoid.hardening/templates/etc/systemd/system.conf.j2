@@ -1,9 +1,9 @@
 # {{ ansible_managed }}
 
 [Manager]
-DumpCore=no
-CrashShell=no
-CtrlAltDelBurstAction=none
+DumpCore=no # https://superuser.com/questions/1708219/what-does-systemds-manager-dumpcore-option-do -> https://manpages.debian.org/bullseye-backports/systemd/systemd.1.en.html ?
+CrashShell=no # already the default
+CtrlAltDelBurstAction=none # https://github.com/konstruktoid/ansible-role-hardening/issues/82
 DefaultLimitCORE=0
 DefaultLimitNOFILE={{ limit_nofile_hard }}
 DefaultLimitNPROC={{ limit_nproc_hard }}
